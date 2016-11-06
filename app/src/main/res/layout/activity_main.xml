@@ -27,9 +27,9 @@
     <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginTop="26dp"
         android:layout_below="@id/button"
         android:visibility="invisible"
-        android:text="Welcome back to the android development!" />
+        android:text="Making a call to web service and will  return the list of registered users!" />
 </RelativeLayout>
