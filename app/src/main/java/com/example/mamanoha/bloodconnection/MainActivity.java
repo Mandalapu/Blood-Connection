@@ -1,6 +1,7 @@
 package com.example.mamanoha.bloodconnection;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -22,7 +23,7 @@ import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button button1;
+    Button button1, button2;
     TextView tv1;
     ProgressDialog prgDialog;
 
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         button1 = (Button) findViewById(R.id.button);
+        button2 = (Button) findViewById(R.id.button2);
         tv1 = (TextView) findViewById(R.id.textView1);
         prgDialog = new ProgressDialog(this);
         button1.setOnClickListener(new View.OnClickListener() {
@@ -43,6 +45,14 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("log", "before button clicked");
                 new invokeWebService().execute();
                 tv1.setVisibility(View.VISIBLE);
+            }
+        });
+        button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("log", "Taking you to the next activity");
+                Intent mapIntent = new Intent(MainActivity.this, MapsActivity.class);
+                startActivity(mapIntent);
             }
         });
     }
@@ -65,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
             //this method will be running on background thread so don't update UI frome here
             //do your long running http tasks here,you dont want to pass argument and u can access the parent class' variable url over here
-            String urls = "http://10.0.0.2:8080/GiveAPint/getAllUsers";
+            String urls = "http://192.168.42.76:8080/GiveAPint/getAllUsers";
             JSONArray response = null;
             HttpURLConnection urlConnection = null;
             URL url = null;

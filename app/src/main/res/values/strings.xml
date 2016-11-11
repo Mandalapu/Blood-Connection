@@ -1,3 +1,41 @@
 <resources>
     <string name="app_name">Blood Connection</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_signin">Sign in</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Log in</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+
+    <string name="blood">Choose your BloodGroup</string>
+    <string-array name="bloodgroups">
+        <item><b>Blood Group</b></item>
+        <item>A+</item>
+        <item>A-</item>
+        <item>B+</item>
+        <item>B-</item>
+        <item>AB+</item>
+        <item>AB-</item>
+        <item>O+</item>
+        <item>O-</item>
+    </string-array>
+
+    <string name="loginlink">
+        <u><b>Login</b></u>
+    </string>
+
+    <string name="registerlink">
+        <u><b>Register</b></u>
+    </string>
+    <string name="title_activity_registration">RegistrationActivity</string>
+
 </resources>

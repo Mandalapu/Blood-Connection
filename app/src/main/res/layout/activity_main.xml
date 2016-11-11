@@ -24,6 +24,14 @@
         android:layout_alignParentEnd="true"
         android:layout_marginTop="26dp"
         android:id="@+id/button" />
+    <Button
+        android:text="Map Activity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/button"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="26dp"
+        android:id="@+id/button2" />
     <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
