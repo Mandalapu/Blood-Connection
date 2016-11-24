@@ -4,21 +4,15 @@ import android.app.ProgressDialog;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
-import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -37,24 +31,27 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.Manifest;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.SeekBar;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.DoubleBuffer;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
@@ -95,10 +92,91 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         requestNewPermissions();
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(60 * 1000)        // 600 seconds(10 minutes), in milliseconds
+                .setInterval(60 * 1000)        // 60 seconds(1 minutes), in milliseconds
                 .setFastestInterval(1 * 1000); // 1 second, in milliseconds
         // TODO: 11/8/2016  Need to change the  frequency keeping the phone battery in mind.
         //The frequency would be same for updating the current registered users and current user.
+        //Getting the widget references and onClickListeners are added for there to perform appropriate actions.
+        Button requestButton_Knn = (Button) findViewById(R.id.requestButton_Knn);
+        Button requestButton_Range = (Button) findViewById(R.id.requestButton_Range);
+        Button requestBloodButton = (Button) findViewById(R.id.requestBloodButton);
+        Button requestSubmitButtonKnn = (Button) findViewById(R.id.knnSubmit);
+        Button requestSubmitButtonRange = (Button) findViewById(R.id.rangeSubmit);
+        final LinearLayout requestButtonsSub = (LinearLayout) findViewById(R.id.requestButtons_sub);
+        final RelativeLayout requestLayoutKnn = (RelativeLayout) findViewById(R.id.requestFormLayoutKnn);
+        final RelativeLayout requestLayoutRange = (RelativeLayout) findViewById(R.id.requestFormLayoutRange);
+        requestBloodButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("OnButtonClicked", "Came inside the request button onclick");
+                if( requestButtonsSub.getVisibility() != View.VISIBLE )
+                {
+                    requestButtonsSub.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        requestButton_Knn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("OnButtonClicked", "RequestButton knn pressed");
+                if( requestLayoutKnn.getVisibility() != View.VISIBLE )
+                {
+                    Log.d("onButtonClicked", "NOT VISIBLE, should be changed");
+                    requestLayoutKnn.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        // TODO: 11/24/2016 Display the request form for performing the range request. Should be changed to form with proper fields.
+        requestButton_Range.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("OnButtonClicked", "RequestButton range pressed");
+                if( requestLayoutRange.getVisibility() != View.VISIBLE )
+                {
+                    Log.d("onButtonClicked", "NOT VISIBLE, should be changed");
+                    requestLayoutRange.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        SeekBar seekBar = (SeekBar)findViewById(R.id.rangeSeekBar);
+        final TextView seekBarValue = (TextView)findViewById(R.id.textView_rangeValue);
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress,
+                                          boolean fromUser) {
+                // TODO Auto-generated method stub
+                seekBarValue.setText(String.valueOf(progress));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+            }
+        });
+        requestSubmitButtonKnn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                requestLayoutRange.setVisibility(View.INVISIBLE);
+                requestLayoutKnn.setVisibility(View.INVISIBLE);
+                //// TODO: 11/24/2016 in future, add a sync class to make a call to the backend for submitting the request.
+                requestButtonsSub.setVisibility(View.INVISIBLE);
+            }
+        });
+        requestSubmitButtonRange.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                requestLayoutKnn.setVisibility(View.INVISIBLE);
+                requestLayoutRange.setVisibility(View.INVISIBLE);
+                requestButtonsSub.setVisibility(View.INVISIBLE);
+            }
+        });
 
     }
 
@@ -447,6 +525,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             {
                 Map<String, String> mapParams = new HashMap<>();
                 // TODO: 11/8/2016 Make sure that the hard coded values are replaced by the userInformation class variables.
+
                 mapParams.put("userid", Integer.toString(1));
                 mapParams.put("token", "5po6gr6lorf48");
                 mapParams.put("latCoord", Double.toString(newLatitude));

@@ -146,7 +146,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(getApplicationContext(), SigninActivity.class);
+                Intent i = new Intent(getApplicationContext(), LoginActivity.class);
                 startActivity(i);
             }
         });
@@ -224,6 +224,7 @@ public class RegistrationActivity extends AppCompatActivity {
             }
             catch(MalformedURLException e)
             {
+                e.printStackTrace();
                 Log.d("MalformedException",e.getMessage());
             }
             catch(IOException e)
@@ -259,6 +260,7 @@ public class RegistrationActivity extends AppCompatActivity {
             // TODO: 11/10/2016 need to check if the registration is successful.
             try
             {
+                Log.d("OnPostExecute", "came inside the onPostExecute");
                 if( !(result.getString("error").equals("")) )
                 {
                 //If the error string is set in the result. Toast display the error message and then do not propogate
@@ -278,7 +280,7 @@ public class RegistrationActivity extends AppCompatActivity {
                     editor.putString("lastName", result.getString("lastName"));
                     editor.putString("gender", result.getString("gender"));
                     editor.putString("dob", String.valueOf(result.get("dob")));
-                    editor.putInt("userid", result.getInt("userid"));
+                    editor.putInt("userid", result.getInt("userID"));
                     editor.putString("passcode", result.getString("passcode"));
                     editor.putString("phone", result.getString("phone"));
                     //commit the changes.
@@ -286,13 +288,18 @@ public class RegistrationActivity extends AppCompatActivity {
                     editor.apply();
                     Log.d("Shared Preferences", "Successfully stored data into the shared preferences");
                     Toast.makeText(getApplicationContext(), "Registration Successful", Toast.LENGTH_SHORT).show();
-                    Intent i = new Intent(getApplicationContext(), SigninActivity.class);
+                    Intent i = new Intent(getApplicationContext(), LoginActivity.class);
                     startActivity(i);
                 }
             }
             catch(JSONException e)
             {
+                e.printStackTrace();
                 Log.d("Exception", "Exception while parsing the Json result");
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
             }
             //this method will be running on UI thread
             pdLoading.dismiss();

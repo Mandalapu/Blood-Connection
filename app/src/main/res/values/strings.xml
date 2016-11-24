@@ -15,8 +15,10 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
-
+    <string name="bloodGroup">Blood Group:</string>
+    <string name="kValue">Nearest Neighbors:</string>
     <string name="blood">Choose your BloodGroup</string>
+
     <string-array name="bloodgroups">
         <item><b>Blood Group</b></item>
         <item>A+</item>
@@ -27,6 +29,17 @@
         <item>AB-</item>
         <item>O+</item>
         <item>O-</item>
+    </string-array>
+    <string-array name="kVal">
+        <item><b>Neighbors</b></item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
     </string-array>
 
     <string name="loginlink">
