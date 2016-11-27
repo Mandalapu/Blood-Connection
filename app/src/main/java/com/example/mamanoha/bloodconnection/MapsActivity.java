@@ -1,15 +1,21 @@
 package com.example.mamanoha.bloodconnection;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
 
 import com.google.android.gms.appindexing.AppIndex;
@@ -26,15 +32,19 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.Manifest;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
@@ -51,11 +61,12 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
-
+public class MapsActivity extends  AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, NavigationView.OnNavigationItemSelectedListener {
+    private static final String TAG = MapsActivity.class.getSimpleName();
     private GoogleMap mMap;
     private GoogleApiClient googleApiClient;
     private LatLng currentLocation;
@@ -65,14 +76,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private final int PERMISSION_ACCESS_FINE_LOCATION = 1;
     private MarkerOptions userMarkerOptions;
     private Marker userMarker;
+    private SharedPreferences prefs;
+    //Parameters for making request, used by both the Knn and RangeQuery.
+    private String queryType;
+    private int userId;
+    private int emergencyLevel;
+    private int kVal;
+    private double rangeVal;
+    private long timestamp;
+    private Date currentDate;
+    private String token;
+    private String status;
+    private String requestBloodGroup;
+    //End of the parameters.
+    private RatingBar emergencyLevel_Knn;
+    private RatingBar emergencyLevel_Range;
+    private Spinner requestBloodGroup_Knn;
+    private Spinner requestBloodGroup_Range;
+    private Spinner kValueSpinner;
+    private TextView rangeValue;
+    private Map<String, String> params = new HashMap<>();
+    private Toolbar toolbar;
     int count = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         //Constructing the googleApIClient which can be used to for many services including Location.
-        // TODO: 11/10/2016  This is very very important, userid is set to be "1" which should be changed after the first three
-        //activities are connected.
-        UserInformation.setUserId(1);
+
         if (googleApiClient == null) {
             // ATTENTION: This "addApi(AppIndex.API)"was auto-generated to implement the App Indexing API.
             // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -89,10 +120,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         Log.d("Map", "mapFragement is ready");
+        // Set a Toolbar to replace the ActionBar.
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        //Get the drawer layout.
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+        //Intialize the navigation view.
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        View headerView = navigationView.inflateHeaderView(R.layout.nav_header_sample);
+        //Set the fields in the navHeadBar. Retrieve the values from the shared preferences.
+        TextView navHeaderName = (TextView) headerView.findViewById(R.id.nav_header_name);
+        TextView navHeaderUserName = (TextView) headerView.findViewById(R.id.nav_header_username);
+        StringBuilder name = new StringBuilder();
+        name.append(prefs.getString("firstName", "firstName")).append(" ,").append(" "+prefs.getString("lastName", "lastName"));
+        navHeaderName.setText(name.toString());
+        navHeaderUserName.setText(prefs.getString("userName", "userName"));
         requestNewPermissions();
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(60 * 1000)        // 60 seconds(1 minutes), in milliseconds
+                .setInterval(120 * 1000)        // 240 seconds(4 minutes), in milliseconds
                 .setFastestInterval(1 * 1000); // 1 second, in milliseconds
         // TODO: 11/8/2016  Need to change the  frequency keeping the phone battery in mind.
         //The frequency would be same for updating the current registered users and current user.
@@ -122,11 +174,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if( requestLayoutKnn.getVisibility() != View.VISIBLE )
                 {
                     Log.d("onButtonClicked", "NOT VISIBLE, should be changed");
+                    requestLayoutRange.setVisibility(View.INVISIBLE);
                     requestLayoutKnn.setVisibility(View.VISIBLE);
                 }
             }
         });
-        // TODO: 11/24/2016 Display the request form for performing the range request. Should be changed to form with proper fields.
         requestButton_Range.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -134,6 +186,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if( requestLayoutRange.getVisibility() != View.VISIBLE )
                 {
                     Log.d("onButtonClicked", "NOT VISIBLE, should be changed");
+                    requestLayoutKnn.setVisibility(View.INVISIBLE);
                     requestLayoutRange.setVisibility(View.VISIBLE);
                 }
             }
@@ -163,21 +216,121 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         requestSubmitButtonKnn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //queryType = "KnnQuery";
+                params.clear();
+                params.put("queryType", "KnnQuery");
+                userId = prefs.getInt("userId", 0);
+                params.put("userId", String.valueOf(userId));
+                currentDate = new Date();
+                params.put("currentDate", currentDate.toString());
+                timestamp = currentDate.getTime();
+                params.put("timeStamp", String.valueOf(timestamp));
+                token = prefs.getString("token", "");
+                params.put("token", token);
+                status = "Waiting For Response";
+                params.put("status", status);
+                //Get values for kVal, emergencyValue, bloodGroupType,
+                emergencyLevel_Knn = (RatingBar) findViewById(R.id.emergencyRating_KNN);
+                requestBloodGroup_Knn = (Spinner) findViewById(R.id.requestBloodType_KNN);
+                kValueSpinner = (Spinner) findViewById(R.id.requestkVal);
+                //Extract the values.
+                emergencyLevel = (int) emergencyLevel_Knn.getRating();
+                params.put("emergencyLevel", String.valueOf(emergencyLevel));
+                requestBloodGroup = requestBloodGroup_Knn.getSelectedItem().toString();
+                params.put("bloodGroup", requestBloodGroup);
+                String kValue = kValueSpinner.getSelectedItem().toString();
+                kVal = Integer.parseInt(kValue);
+                params.put("kVal", String.valueOf(kVal));
+                String requestUrl = constructRequestUrl(params);
+                new RequestBlood().execute(requestUrl);
+                //these debugging statements should be displayed after the successful execution of the query.
+                Log.d(TAG, "QUERY TYPE:" +queryType);
+                Log.d(TAG, "User ID: "+userId);
+                Log.d(TAG, "Current Date:" +currentDate);
+                Log.d(TAG, "time stamp:" +timestamp);
+                Log.d(TAG, "token:" +token);
+                Log.d(TAG, "emergencyLevel:" +emergencyLevel);
+                Log.d(TAG, "requestBloodGroup_Knn: " +requestBloodGroup);
+                Log.d(TAG, "kValue: " +kVal);
                 requestLayoutRange.setVisibility(View.INVISIBLE);
                 requestLayoutKnn.setVisibility(View.INVISIBLE);
-                //// TODO: 11/24/2016 in future, add a sync class to make a call to the backend for submitting the request.
                 requestButtonsSub.setVisibility(View.INVISIBLE);
             }
         });
         requestSubmitButtonRange.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                params.clear();
+                params.put("queryType", "RangeQuery");
+                userId = prefs.getInt("userId", 0);
+                params.put("userId", String.valueOf(userId));
+                currentDate = new Date();
+                params.put("currentDate", currentDate.toString());
+                // TODO: 11/24/2016 Parse the date to get more exact time Stamp.
+                timestamp = currentDate.getTime();
+                params.put("timeStamp", String.valueOf(timestamp));
+                token = prefs.getString("token", "");
+                params.put("token", token);
+                status = "Waiting For Response";
+                params.put("status", status);
+                //Get values for kVal, emergencyValue, bloodGroupType,
+                emergencyLevel_Range = (RatingBar) findViewById(R.id.emergencyRating_Range);
+                requestBloodGroup_Range = (Spinner) findViewById(R.id.requestBloodType_Range);
+                //Extract the values.
+                emergencyLevel = (int) emergencyLevel_Range.getRating();
+                params.put("emergencyLevel", String.valueOf(emergencyLevel));
+                requestBloodGroup = requestBloodGroup_Range.getSelectedItem().toString();
+                params.put("bloodGroup", requestBloodGroup);
+                rangeValue = (TextView) findViewById(R.id.textView_rangeValue);
+                rangeVal = Double.valueOf(rangeValue.getText().toString());
+                params.put("rangeVal", String.valueOf(rangeVal));
+                String requestUrl = constructRequestUrl(params);
+                new RequestBlood().execute(requestUrl);
+                Log.d(TAG, "Returned back to the listener method after async task");
+                Log.d(TAG, "QUERY TYPE:" +queryType);
+                Log.d(TAG, "User ID: "+userId);
+                Log.d(TAG, "Current Date:" +currentDate);
+                Log.d(TAG, "time stamp:" +timestamp);
+                Log.d(TAG, "token:" +token);
+                Log.d(TAG, "emergencyLevelKnn:" +emergencyLevel);
+                Log.d(TAG, "requestBloodGroup_Rnage: " +requestBloodGroup);
+                Log.d(TAG, "rangeValue: " +rangeVal);
                 requestLayoutKnn.setVisibility(View.INVISIBLE);
                 requestLayoutRange.setVisibility(View.INVISIBLE);
                 requestButtonsSub.setVisibility(View.INVISIBLE);
             }
         });
 
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+        Intent nextIntent;
+        if (id == R.id.profile) {
+            nextIntent = new Intent(MapsActivity.this, FragmentSample.class);
+            startActivity(nextIntent);
+        } else if (id == R.id.requests) {
+            nextIntent = new Intent(MapsActivity.this, FragmentSample.class);
+            startActivity(nextIntent);
+        } else if (id == R.id.donations) {
+            nextIntent = new Intent(MapsActivity.this, FragmentSample.class);
+            startActivity(nextIntent);
+        }
+        else if (id == R.id.aboutUs) {
+            nextIntent = new Intent(MapsActivity.this, FragmentSample.class);
+            startActivity(nextIntent);
+        }
+        else if (id == R.id.respondedRequests) {
+            nextIntent = new Intent(MapsActivity.this, FragmentSample.class);
+            startActivity(nextIntent);
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 
     private void requestNewPermissions() {
@@ -325,6 +478,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
     public void onResume()
     {
         super.onResume();
@@ -369,22 +532,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.clear();
         Log.d("CLEAR", "Successfully cleared all markers");
         //If adding the current user marker for the first time.
-       // if( userMarker == null || userMarkerOptions == null )
+        // if( userMarker == null || userMarkerOptions == null )
         //{
-            userMarkerOptions = new MarkerOptions().position(currentLocation);
-            userMarker = mMap.addMarker(userMarkerOptions.title("You're here"));
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 14));
-            Log.d("on location change", "marker added for current user");
+        userMarkerOptions = new MarkerOptions().position(currentLocation);
+        userMarker = mMap.addMarker(userMarkerOptions.title("You're here"));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 14));
+        Log.d("on location change", "marker added for current user");
         //}
         //else, we need to update the marker instead of adding a new marker at new location. This makes sure that there is
         //only marker for current user which is changed frequentlyas he moves his location.
-       /** else
-        {
-            Log.d("on location change", "Position set for current user");
-            userMarker.setPosition(currentLocation);
-        }*/
+        /** else
+         {
+         Log.d("on location change", "Position set for current user");
+         userMarker.setPosition(currentLocation);
+         }*/
         //U[pdate the current location of the user according to the frequency time set.
-        new UpdateUserLocation().execute(location.getLatitude(), location.getLongitude());
+        String urls = constructQuery(location.getLatitude(), location.getLongitude());
+        new UpdateUserLocation().execute(urls);
         Log.d("Asynctask", "Succesfully updated the user location in the database");
         Log.d("Success", "Successfully fetched the current user location");
         //Clear the map and set back the all the user locations.
@@ -395,15 +559,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
+
     private class GetUserLocations extends AsyncTask<Void, Void, JSONArray> {
         ProgressDialog pdLoading = new ProgressDialog(MapsActivity.this);
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             //this method will be running on UI thread
-            Log.d("log","inside the preexecute method");
-            pdLoading.setMessage("connecting to server...");
-            pdLoading.show();
+            Log.d(TAG,"Fetching all the user locations");
         }
 
         @Override
@@ -420,7 +583,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             JSONArray resultArray = new JSONArray();
             try
             {
-                Log.d("log", "before making the url call");
+                Log.d("log", "before making the url call to fetch the locations");
+                Log.d("URL received", urls );
                 url = new URL(urls);
                 urlConnection = (HttpURLConnection) url.openConnection();
                 Log.d("log", "trying to get the output");
@@ -464,14 +628,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         protected void onPostExecute(JSONArray result) {
             super.onPostExecute(result);
-            pdLoading.setMessage("call success to the server");
             Log.d("postexecute", result.toString());
+            int userId = prefs.getInt("userId", 0);
+            Log.d(TAG, "Got all the locations: see the userId stored in the prefs " +userId);
             try {
                 for (int i = 0; i < result.length(); i++) {
                     JSONObject item = (JSONObject) result.get(i);
-                    // TODO: 11/8/2016  Need to add a if condition to not add a duplicate marker for the current user, as his location
-                    // location is updated and marked seperately.
-                    if( item.getInt("userid") != UserInformation.getUserId() ) {
+                    // TODO: 11/8/2016  Need to see that the condition is working properly.
+                    if( item.getInt("userid") !=  userId ) {
                         Log.d("Result", "New item");
                         Log.d("Result", Integer.toString(item.getInt("userid")));
                         Log.d("Result", Double.toString(item.getDouble("latCoord")));
@@ -488,52 +652,38 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             {
                 Log.d("Exception", "Exception occurred while parsing the result");
             }
-            //this method will be running on UI thread
-            pdLoading.dismiss();
+
         }
 
     }
 
-    private class UpdateUserLocation extends AsyncTask<Double, Void, JSONObject> {
+    private class UpdateUserLocation extends AsyncTask<String, Void, JSONObject> {
         ProgressDialog pdLoading = new ProgressDialog(MapsActivity.this);
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             //this method will be running on UI thread
             Log.d("log","inside the preexecute method");
-            pdLoading.setMessage("connecting to server...");
-            pdLoading.show();
+            Log.d(TAG, "Updating the user location");
         }
 
         @Override
-        protected JSONObject doInBackground(Double... params) {
+        protected JSONObject doInBackground(String... params) {
 
             //this method will be running on background thread so don't update UI frome here
             //do your long running http tasks here,you dont want to pass argument and u can access the parent class' variable url over here
-            String urls = "http://192.168.42.76:8080/GiveAPint/updateLocation?";
+            String urls = params[0];
+            Log.d(TAG, "Came inside the doInBackGround method");
+            Log.d(TAG, "Url received as argument is: " +urls);
             JSONArray response = null;
             HttpURLConnection urlConnection = null;
             URL url = null;
             StringBuilder result = new StringBuilder();
             String line;
             JSONObject resultObject = new JSONObject();
-            double newLatitude = params[0];
-            double newLongitude = params[1];
-            Log.d("current Latitude", Double.toString(newLatitude));
-            Log.d("Current Longitude", Double.toString(newLongitude));
             try
             {
-                Map<String, String> mapParams = new HashMap<>();
-                // TODO: 11/8/2016 Make sure that the hard coded values are replaced by the userInformation class variables.
-
-                mapParams.put("userid", Integer.toString(1));
-                mapParams.put("token", "5po6gr6lorf48");
-                mapParams.put("latCoord", Double.toString(newLatitude));
-                mapParams.put("longCoord", Double.toString(newLongitude));
-                Log.d("New call", "created the map params for updating the user location");
-                urls = constructQuery(urls, mapParams);
                 Log.d("log", "before making the url call update call");
-                Log.d("URL construcuted", urls);
                 url = new URL(urls);
                 urlConnection = (HttpURLConnection) url.openConnection();
                 InputStream in = new BufferedInputStream(urlConnection.getInputStream());
@@ -542,7 +692,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 while ((line = reader.readLine()) != null) {
                     result.append(line);
                 }
-                 resultObject = new JSONObject(result.toString());
+                resultObject = new JSONObject(result.toString());
                 Log.d("Result RETURNEd", result.toString());
             }
             catch(MalformedURLException e)
@@ -574,69 +724,186 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return resultObject;
             //return;
         }
-
-
-        @NonNull
-        private String constructQuery(String url, Map<String, String> params)
-        {
-            StringBuilder result = new StringBuilder();
-            result.append(url);
-            boolean first = true;
-            try {
-                for (Map.Entry<String, String> entry : params.entrySet()) {
-                    if (first)
-                        first = false;
-                    else
-                        result.append("&");
-
-                    result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
-                    result.append("=");
-                    result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
-                }
-            }
-            catch(UnsupportedEncodingException e)
-            {
-                Log.d("Exception", "Exception occurred while encoding the URL");
-                e.printStackTrace();
-            }
-            Log.d("construct Query output", result.toString());
-            return result.toString();
-        }
         @Override
         protected void onPostExecute(JSONObject result) {
             super.onPostExecute(result);
-            pdLoading.setMessage("call success to the server");
-            Log.d("postexecute", result.toString());
-            Log.d("Post Execute", result.toString());
-            Log.d("Success", "Successfully updated the current user location");
-            /**try {
-                for (int i = 0; i < result.length(); i++) {
-                    JSONObject item = (JSONObject) result.get(i);
-                    // TODO: 11/8/2016  Need to add a if condition to not add a duplicate marker for the current user, as his location
-                    // location is updated and marked seperately.
-                    //if( item.getInt("userid") != UserInformation.getUserId() )
-                    //{
-                    Log.d("Result", "New item");
-                    Log.d("Result", Integer.toString(item.getInt("userid")));
-                    Log.d("Result", Double.toString(item.getDouble("latCoord")));
-                    Log.d("Result", Double.toString(item.getDouble("longCoord")));
-                    //Adding markers on the map after fetching the user locations from the database
-                    LatLng usersLocation = new LatLng(item.getDouble("latCoord"), item.getDouble("longCoord"));
-                    mMap.addMarker(new MarkerOptions().position(usersLocation).title(Integer.toString(item.getInt("userid"))));
-                    Log.d("Map", "Location fetched is marked on the map");
-                    // }
+            try {
+                if ( (result.getString("error").equals("")) ) {
+                    pdLoading.setMessage("call success to the server");
+                    Log.d("postexecute", result.toString());
+                    Log.d("Post Execute", result.toString());
+                    Log.d("Success", "Successfully updated the current user location");
 
-
+                } else {
+                    Log.d(TAG, "Error occurred while updating the user location");
                 }
             }
             catch(JSONException e)
             {
-                Log.d("Exception", "Exception occurred while parsing the result");
-            }**/
-            //this method will be running on UI thread
+                Log.d(TAG, "Exception occurred while updating the location");
+            }
+
             pdLoading.dismiss();
         }
 
     }
+
+    @NonNull
+    private String constructQuery(Double newLatitude, Double newLongitude)
+    {
+        String token = prefs.getString("token", "");
+        int userId = prefs.getInt("userId", 0);
+        Log.d(TAG, "Triggered the construct query method:");
+        Log.d(TAG, "Token and UserId retrieved from the prefs");
+        Log.d(TAG, "userid: " +userId);
+        Log.d(TAG, "token: "+token);
+        StringBuilder result = new StringBuilder("http://192.168.42.76:8080/GiveAPint/updateLocation?");
+        try {
+            result.append(URLEncoder.encode("userid", "UTF-8")).append("=").append(URLEncoder.encode(String.valueOf(userId), "UTF-8")).append("&")
+                    .append(URLEncoder.encode("token", "UTF-8")).append("=").append(URLEncoder.encode(token, "UTF-8")).append("&")
+                    .append(URLEncoder.encode("latCoord", "UTF-8")).append("=").append(URLEncoder.encode(String.valueOf(newLatitude), "UTF-8")).append("&")
+                    .append(URLEncoder.encode("longCoord", "UTF-8")).append("=").append(URLEncoder.encode(String.valueOf(newLongitude), "UTF-8"));
+        }
+        catch(UnsupportedEncodingException e)
+        {
+            Log.d("Exception", "Exception occurred while encoding the URL");
+            e.printStackTrace();
+        }
+        Log.d("construct Query output", result.toString());
+        return result.toString();
+    }
+
+    /**
+     * Builds http url for making a request(Knn, Range). This is mapped to "requestBlood" controller method.
+     * @param params contains all the parameters required for constructing the url.
+     * @return url string.
+     */
+    @NonNull
+    private String constructRequestUrl(Map<String, String> params)
+    {
+        StringBuilder result = new StringBuilder("http://192.168.42.76:8080/GiveAPint/requestBlood?");
+        boolean first = true;
+        try {
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                if (first)
+                    first = false;
+                else
+                    result.append("&");
+
+                result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
+                result.append("=");
+                result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+            }
+        }
+        catch(UnsupportedEncodingException e)
+        {
+            Log.d("Exception", "Exception occurred while encoding the URL");
+            e.printStackTrace();
+        }
+        Log.d("construct Query output", result.toString());
+        return result.toString();
+    }
+
+    /**
+     * Async call to request the blood, url to the service is passed as an argument and there is no difference in'
+     * the implementation for the Knn and Range query as the only difference is the url passed.
+     */
+    private class RequestBlood extends AsyncTask<String, Void, JSONObject> {
+        ProgressDialog pdLoading = new ProgressDialog(MapsActivity.this);
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            //this method will be running on UI thread
+            Log.d("log","inside the preexecute method");
+            pdLoading.setMessage("Sending request...");
+            pdLoading.show();
+        }
+
+        @Override
+        protected JSONObject doInBackground(String... params) {
+
+            //this method will be running on background thread so don't update UI frome here
+            //do your long running http tasks here,you dont want to pass argument and u can access the parent class' variable url over here
+            pdLoading.show();
+            String urls = params[0];
+            Log.d(TAG, "Came inside the doInBackGround method");
+            Log.d(TAG, "Url received as argument is: " +urls);
+            JSONArray response = null;
+            HttpURLConnection urlConnection = null;
+            URL url = null;
+            StringBuilder result = new StringBuilder();
+            String line;
+            JSONObject resultObject = new JSONObject();
+            try
+            {
+                Log.d("log", "before making the url call update call");
+                url = new URL(urls);
+                urlConnection = (HttpURLConnection) url.openConnection();
+                InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                Log.d("log","got the output, before parsing the result");
+                while ((line = reader.readLine()) != null) {
+                    result.append(line);
+                }
+                resultObject = new JSONObject(result.toString());
+                Log.d("Result RETURNEd", result.toString());
+            }
+            catch(MalformedURLException e)
+            {
+                Log.d("MalformedException",e.getMessage());
+            }
+            catch(IOException e)
+            {
+                Log.d("IOException",e.getMessage());
+                e.printStackTrace();
+                Log.d("IOEXCEPTION", "Exception occured here");
+            }
+            catch(JSONException  e)
+            {
+                Log.d("Exception", "Exception occurred while parsing the Json object");
+            }
+            catch( Exception e)
+            {
+                Log.d("Exception", "Normal exception occured  while making a call");
+                e.printStackTrace();
+                //Log.d("Exception", e.getLocalizedMessage());
+            }
+            finally
+            {
+                urlConnection.disconnect();
+            }
+            Log.d("log","about to return the result");
+            //Log.d("log", resultArray.toString());
+            return resultObject;
+            //return;
+        }
+        @Override
+        protected void onPostExecute(JSONObject result) {
+            super.onPostExecute(result);
+            // TODO: 11/25/2016 Check the error message and display the toast message succesfully.
+            try {
+                if ( (result.getString("error").equals("")) ) {
+                    Toast.makeText(getApplicationContext(), "Request sent", Toast.LENGTH_SHORT).show();
+                    Log.d("postexecute", result.toString());
+                    Log.d("Post Execute", "Request successfully sent");
+                    Log.d("Error Status", "Error value: " +result.getString("error"));
+
+                }
+                else
+                {
+                    Toast.makeText(getApplicationContext(), "Error: "+result.getString("error"), Toast.LENGTH_SHORT).show();
+                    Log.d("Error Status", "Error value: " +result.getString("error"));
+                }
+            }
+            catch (JSONException e)
+            {
+                e.printStackTrace();
+                Log.d(TAG, "Exception occurred while parsing the result");
+            }
+            pdLoading.dismiss();
+        }
+
+    }
+
 }
 

@@ -14,6 +14,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.mamanoha.bloodconnection.Service.MyFirebaseInstanceIDService;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -36,6 +38,7 @@ public class LoginActivity extends AppCompatActivity {
     private String urls;
     private String token;
     private SharedPreferences preferences;
+    private MyFirebaseInstanceIDService firebaseInstanceIDService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -177,7 +180,7 @@ public class LoginActivity extends AppCompatActivity {
             // TODO: 11/10/2016 need to check if the registration is successful.
             try {
                 Log.d("OnPostExecute", "came inside the onPostExecute");
-                if (!(result.getString("error").equals(""))) {
+                if ( !(result.getString("error").equals("")) ) {
                     //If the error string is set in the result. Toast display the error message and then do not propogate
                     // into the next intent.
                     Toast.makeText(getApplicationContext(), "Error: " + result.getString("error"), Toast.LENGTH_SHORT).show();
@@ -193,9 +196,124 @@ public class LoginActivity extends AppCompatActivity {
                     editor.putBoolean("isUserLogin", true);
                     editor.apply();
                     Log.d("Log", "Successfully written in shared preferences");
+                    //Make a call here after successful login to send the regsitration id to the service.
+                    firebaseInstanceIDService = new MyFirebaseInstanceIDService();
+                    String userName = preferences.getString("userName", "");
+                    String regId = preferences.getString("regId", "");
+                    Log.d("regId", "retrieved regId from the preferences:" +regId);
+                    new UpdateNotification().execute(userName, regId);
                     Toast.makeText(getApplicationContext(), "Login successful", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
                     startActivity(intent);
+                }
+            }
+            catch(JSONException e)
+            {
+                e.printStackTrace();
+                Log.d("Exception", "Exception while parsing the result");
+            }
+        }
+
+    }
+
+    private class UpdateNotification extends AsyncTask<String, Void, JSONObject>
+    {
+
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+            //this method will be running on UI thread
+            Log.d("log","inside the preexecute method");
+        }
+
+        private String constructQuery(String userName, String regId)
+        {
+            StringBuilder result = new StringBuilder();
+            try {
+                result.append("http://192.168.42.76:8080/GiveAPint/registerNotificationToken?");
+                result.append(URLEncoder.encode("userName", "UTF-8")).append("=").append(URLEncoder.encode(userName, "UTF-8")).append("&")
+                        .append(URLEncoder.encode("regId", "UTF-8")).append("=").append(URLEncoder.encode(regId, "UTF-8"));
+            }
+            catch(UnsupportedEncodingException e)
+            {
+                e.printStackTrace();
+                Log.d("Exception", "Exception while constructing the URL");
+            }
+            Log.d("noti service url", result.toString());
+            return result.toString();
+        }
+
+        @Override
+        protected JSONObject doInBackground(String... params)
+        {
+            //Constructing the query required to make a call to the service.
+            urls = constructQuery(params[0], params[1]);
+            Log.d("Changed Query is:", urls);
+            HttpURLConnection urlConnection = null;
+            URL url = null;
+            StringBuilder result = new StringBuilder();
+            String line;
+            JSONObject resultObject = new JSONObject();
+            try
+            {
+                Log.d("log", "before making the url call");
+                url = new URL(urls);
+                urlConnection = (HttpURLConnection) url.openConnection();
+                Log.d("log", "trying to get the output");
+                InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                Log.d("log","got the output, before parsing the result");
+                while ((line = reader.readLine()) != null) {
+                    result.append(line);
+                }
+                resultObject = new JSONObject(result.toString());
+                Log.d("Result", result.toString());
+            }
+            catch(MalformedURLException e)
+            {
+                e.printStackTrace();
+                Log.d("MalformedException",e.getMessage());
+            }
+            catch(IOException e)
+            {
+                e.printStackTrace();
+                Log.d("IOException",e.getMessage());
+            }
+            catch(JSONException e)
+            {
+                e.printStackTrace();
+                Log.d("Exception", "Exception occurred while parsing the Json object");
+            }
+            catch( Exception e)
+            {
+                Log.d("Exception", "Normal exception occured  while making a call");
+                e.printStackTrace();
+                //Log.d("Exception", e.getLocalizedMessage());
+            }
+            finally
+            {
+                urlConnection.disconnect();
+            }
+            Log.d("log","about to return the result");
+            //Log.d("log", resultArray.toString());
+            return resultObject;
+        }
+
+        @Override
+        protected void onPostExecute(JSONObject result)
+        {
+            super.onPostExecute(result);
+            // TODO: 11/10/2016 need to check if the registration is successful.
+            try {
+                Log.d("OnPostExecute", "came inside the onPostExecute");
+                if ( !(result.getString("error").equals("")) ) {
+                    //If the error string is set in the result. Toast display the error message and then do not propogate
+                    // into the next intent.
+                    //Toast.makeText(getApplicationContext(), "Error: " + result.getString("error"), Toast.LENGTH_SHORT).show();
+                    Log.d("Notifications", "Error while inserting or updating the notifications token for a corresponding user");
+                } else {
+                    Log.d("Notifications", "Successfully inserted or updated the notifications token for a corresponding user");
                 }
             }
             catch(JSONException e)
@@ -219,8 +337,7 @@ public class LoginActivity extends AppCompatActivity {
         Log.d("onStart token value", token);
         if( isLogin )
         {
-            //If user has already login, then we should move to MainActivity.
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
             startActivity(intent);
         }
         //else, it shouldn't be any different.Just start the activity and do the stuff.

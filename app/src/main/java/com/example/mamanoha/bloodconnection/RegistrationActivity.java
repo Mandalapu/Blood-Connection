@@ -280,7 +280,7 @@ public class RegistrationActivity extends AppCompatActivity {
                     editor.putString("lastName", result.getString("lastName"));
                     editor.putString("gender", result.getString("gender"));
                     editor.putString("dob", String.valueOf(result.get("dob")));
-                    editor.putInt("userid", result.getInt("userID"));
+                    editor.putInt("userId", result.getInt("userID"));
                     editor.putString("passcode", result.getString("passcode"));
                     editor.putString("phone", result.getString("phone"));
                     //commit the changes.

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/profile"
+            android:title="Profile" />
+        <item
+            android:id="@+id/requests"
+            android:title="My Requests" />
+        <item
+            android:id="@+id/respondedRequests"
+            android:title="Responded Requests" />
+        <item
+            android:id="@+id/donations"
+            android:title="Donation History" />
+        <item
+            android:id="@+id/aboutUs"
+            android:title="About Us" />
+    </group>
+
+</menu>

@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Blood Connection</string>
-    <string name="title_activity_maps">Map</string>
-    <string name="title_activity_signin">Sign in</string>
+    <string name="title_activity_maps">Blood Connection</string>
+    <string name="title_activity_signin">Blood Connection</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
@@ -50,5 +50,6 @@
         <u><b>Register</b></u>
     </string>
     <string name="title_activity_registration">RegistrationActivity</string>
-
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>
