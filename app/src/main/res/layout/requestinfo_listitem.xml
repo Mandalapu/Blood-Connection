@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/requestinfo_listitem"
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp"
+    android:paddingBottom="10dp"
+    >
+    <!-- Name -  distance -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="6dp"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:textStyle="bold"
+            android:id="@+id/requestinfo_acceptorname"
+            android:textSize="18sp"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_toRightOf="@+id/requestinfo_acceptorname"
+            android:gravity="right"
+            android:layout_alignParentEnd="true">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:text="Distance:  "
+                android:id="@+id/requestinfo_distance"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:id="@+id/requestinfo_distancevalue"
+                />
+        </LinearLayout>
+    </RelativeLayout>
+    <!-- Age , BloodGroup -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/myrequests_listitem_status"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="6dp">
+        <LinearLayout
+            android:id="@+id/layout_age"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="left"
+            android:layout_alignParentStart="true">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:text="Age:  "
+                android:id="@+id/requestinfo_agetv"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:id="@+id/requestinfo_agevalue"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_toRightOf="@+id/layout_age"
+            android:gravity="right"
+            android:layout_alignParentEnd="true">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:text="Blood Group:  "
+                android:id="@+id/requestinfo_bloodgrouptv"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:id="@+id/requestinfo_bloodgroupvalue"
+                />
+        </LinearLayout>
+    </RelativeLayout>
+    <!-- Replace the Rating bar with the Call button -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/requestinfo_button"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="6dp"
+        android:gravity="right">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Call"
+            android:id="@+id/requestinfo_connectbutton"
+            android:background="@color/callbutton"
+            android:focusable="false"
+            android:textColor="@color/background"
+            android:textSize="16sp"/>
+
+    </RelativeLayout>
+    <!-- Aceeptor id-->
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:id="@+id/myrequests_listitem_hidden"
+        android:visibility="gone">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/requestinfoacceptorid" />
+    </RelativeLayout>
+</LinearLayout>

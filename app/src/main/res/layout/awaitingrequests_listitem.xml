@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/awaitingrequests_listitem"
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp"
+    android:paddingBottom="10dp">
+    <!-- Name -  distance -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="6dp"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:gravity="left"
+            android:text="Name:    "
+            android:id="@+id/awaitingrequests_requesternametv"
+            android:textSize="18sp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/awaitingrequests_requesternametv"
+            android:id="@+id/awaitingrequests_requesternamevalue"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:gravity="right"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="6dp">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="left">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:text="Dist: "
+                android:id="@+id/awaitingrequests_distance"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:id="@+id/awaitingrequests_distancevalue"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:id="@+id/awaitingrequests_bg"
+            android:gravity="right"
+            android:layout_alignParentEnd="true">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:text="Blood Group: "
+                android:id="@+id/awaitingrequests_bloodgrouptv"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:id="@+id/awaitingrequests_bloodgroupvalue"
+                />
+        </LinearLayout>
+    </RelativeLayout>
+    <!-- Emergency, BloodGroup -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/awaitingrequests_layout_emergencyparent"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="6dp">
+        <!-- Emergency and stars in another linear layout-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/awaitingrequests_emergency"
+            android:gravity="left"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/awaitingrequests_emergency_tv"
+                android:text="Emergency:     "
+                android:textSize="16sp"></TextView>
+            <RatingBar
+                android:id="@+id/awaitingrequests_emergency_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="?android:attr/ratingBarStyleSmall"
+                android:numStars="5"
+                android:stepSize="1.0"
+                android:clickable="false"
+                android:focusableInTouchMode="false"
+                android:focusable="false"
+                android:isIndicator="true"
+                android:theme="@style/RatingBar"/>
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/awaitingrequests_buttons"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="6dp">
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="0.3"
+            android:layout_height="30dp"
+            android:layout_gravity="center_vertical"
+            android:padding="4dp"
+            android:id="@+id/awaitingrequests_acceptButton"
+            android:text="Accept"
+            android:background="@color/callbutton"
+            android:focusable="false"
+            android:textColor="@color/background"
+            android:textSize="15sp"/>
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            android:layout_weight="0.3"
+            android:text="Dummy"
+            android:visibility="invisible"/>
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="0.3"
+            android:layout_height="30dp"
+            android:layout_gravity="center_vertical"
+            android:padding="4dp"
+            android:id="@+id/awaitingrequests_declineButton"
+            android:text="Decline"
+            android:background="@color/buttonRed"
+            android:focusable="false"
+            android:textColor="@color/background"
+            android:textSize="15sp"/>
+    </LinearLayout>
+
+    <!-- Contains requestId, so that response to the request can be saved in the databse through an API call-->
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:id="@+id/awaitingrequests_layout_hidden"
+        android:visibility="gone">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/awaitingrequests_requestid" />
+    </RelativeLayout>
+</LinearLayout>

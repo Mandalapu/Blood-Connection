@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:background="@color/requests">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/toolbar_parent"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:titleTextColor="@color/background"
+            app:popupTheme="@style/AppTheme.AppBarOverlay" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <TextView
+        android:layout_width="325dp"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:id="@+id/noawaitingrequestsMessage"
+        android:layout_below="@+id/toolbar_parent"
+        android:text="@string/noawaitingrequests"
+        android:gravity="center_horizontal"/>
+
+    <ListView
+        android:layout_below="@+id/toolbar_parent"
+        android:layout_centerInParent="true"
+        android:layout_width="325dp"
+        android:scrollbars="none"
+        android:dividerHeight="12.0sp"
+        android:layout_marginTop="12dp"
+        android:divider="@color/requests"
+        android:layout_height="wrap_content"
+        android:background="@color/background"
+        android:id="@+id/awaitingrequests_listview">
+    </ListView>
+
+</RelativeLayout>

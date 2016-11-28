@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/requests">
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/toolbar_parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        android:layout_marginBottom="10dp">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:titleMarginStart="30dp"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    </android.support.design.widget.AppBarLayout>
+<!--
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/requests_tv"/> -->
+    <ListView
+
+        android:layout_below="@+id/toolbar_parent"
+        android:layout_centerInParent="true"
+        android:layout_width="325dp"
+        android:scrollbars="none"
+        android:dividerHeight="12.0sp"
+        android:divider="@color/requests"
+        android:layout_height="wrap_content"
+        android:background="@color/background"
+        android:id="@+id/requests_listview">
+    </ListView>
+
+</RelativeLayout>

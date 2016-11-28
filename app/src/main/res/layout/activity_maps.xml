@@ -56,14 +56,15 @@
                         android:layout_weight="1.0"
                         android:layout_height="30dp"
                         android:layout_marginLeft="2dp"
+                        android:layout_gravity="center_vertical"
+                        android:padding="4dp"
                         android:background="@color/colorAccent"
                         android:id="@+id/requestButton_Knn"
-                        android:layout_gravity="center_vertical"
                         android:textSize="14sp"
                         android:text="K-Nearest"
                         android:textColor="@color/background"
                         android:layout_alignBottom="@+id/requestButton_Range"
-                        android:padding="4dp"/>
+                        />
                     <Button
                         android:layout_width="0dp"
                         android:layout_weight="1.0"
@@ -92,6 +93,7 @@
                         android:textSize="20sp"
                         android:id="@+id/requestBloodButton"
                         android:background="@color/buttonRed"
+                        android:textColor="@color/background"
                         android:text="Request Blood"/>
                 </LinearLayout>
             </LinearLayout>

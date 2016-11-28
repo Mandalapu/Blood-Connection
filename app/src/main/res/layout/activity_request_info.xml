@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:background="@color/requests"
+    tools:context="com.example.mamanoha.bloodconnection.RequestInfo">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/toolbar_parent"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:titleTextColor="@color/background"
+            app:popupTheme="@style/AppTheme.AppBarOverlay" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <!-- Image view BloodGroup With button cornerradiius 50
+         TextView Saying the number of users from whom the response is awaiting
+         Time stamp of the request
+         Message If any there are zero number of acceptors
+          ListView  which embeds the requestinfo_item
+          <-->
+
+    <Button
+        android:id="@+id/button_bloodGroup"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_below="@+id/toolbar_parent"
+        android:layout_marginTop="10dp"
+        android:layout_centerInParent="true"
+        android:background="@drawable/round_button"
+        android:clickable="false"
+        android:textColor="@color/background"
+        android:textSize="22sp" />
+    <TextView
+        android:layout_width="match_parent"
+        android:id="@+id/awaitingmessage"
+        android:gravity="center_horizontal"
+        android:textStyle="bold"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/button_bloodGroup"
+        android:layout_marginTop="5dp"
+        android:textSize="18sp"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_time"
+        android:layout_below="@+id/awaitingmessage"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="5dp">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:id="@+id/textview_timevalue"
+        />
+    </LinearLayout>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:layout_below="@id/layout_time"
+        android:layout_marginTop="5dp"
+        android:gravity="center_horizontal"
+        android:text="@string/noacceptors_message"
+        android:id="@+id/noacceptors_message"
+        android:textStyle="bold"
+        android:textSize="16sp" />
+
+    <ListView
+        android:layout_below="@+id/noacceptors_message"
+        android:layout_centerInParent="true"
+        android:layout_width="325dp"
+        android:layout_marginTop="5dp"
+        android:focusable="true"
+        android:scrollbars="none"
+        android:dividerHeight="12.0sp"
+        android:divider="@color/requests"
+        android:layout_height="wrap_content"
+        android:background="@color/background"
+        android:id="@+id/requestinfo_listview">
+    </ListView>
+
+
+</RelativeLayout>

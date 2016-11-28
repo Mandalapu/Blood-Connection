@@ -9,11 +9,8 @@
             android:id="@+id/requests"
             android:title="My Requests" />
         <item
-            android:id="@+id/respondedRequests"
-            android:title="Responded Requests" />
-        <item
-            android:id="@+id/donations"
-            android:title="Donation History" />
+            android:id="@+id/awaitingRequests"
+            android:title="Awaiting Requests" />
         <item
             android:id="@+id/aboutUs"
             android:title="About Us" />

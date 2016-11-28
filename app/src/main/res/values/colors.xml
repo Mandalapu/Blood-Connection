@@ -4,7 +4,9 @@
     <color name="colorPrimaryDark">#b92a1a</color>
     <color name="colorAccent">#161516</color>
     <color name="buttonRed">#FFB31E19</color>
-    <color name="initialRatingBar">#FFF1B8B6</color>
+    <color name="initialRatingBar">#c45956</color>
     <color name="textColor">#F0212121</color>
     <color name="background">#FFFFFF</color>
+    <color name="requests">#e6dede</color>
+    <color name="callbutton">#78c93e</color>
 </resources>

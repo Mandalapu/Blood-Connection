@@ -315,16 +315,13 @@ public class MapsActivity extends  AppCompatActivity implements OnMapReadyCallba
         } else if (id == R.id.requests) {
             nextIntent = new Intent(MapsActivity.this, FragmentSample.class);
             startActivity(nextIntent);
-        } else if (id == R.id.donations) {
-            nextIntent = new Intent(MapsActivity.this, FragmentSample.class);
-            startActivity(nextIntent);
         }
         else if (id == R.id.aboutUs) {
             nextIntent = new Intent(MapsActivity.this, FragmentSample.class);
             startActivity(nextIntent);
         }
-        else if (id == R.id.respondedRequests) {
-            nextIntent = new Intent(MapsActivity.this, FragmentSample.class);
+        else if (id == R.id.awaitingRequests) {
+            nextIntent = new Intent(MapsActivity.this, AwaitingRequests.class);
             startActivity(nextIntent);
         }
 
