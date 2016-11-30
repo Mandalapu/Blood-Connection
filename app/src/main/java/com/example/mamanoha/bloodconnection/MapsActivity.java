@@ -310,14 +310,14 @@ public class MapsActivity extends  AppCompatActivity implements OnMapReadyCallba
         int id = item.getItemId();
         Intent nextIntent;
         if (id == R.id.profile) {
-            nextIntent = new Intent(MapsActivity.this, FragmentSample.class);
+            nextIntent = new Intent(MapsActivity.this, MyProfile.class);
             startActivity(nextIntent);
         } else if (id == R.id.requests) {
             nextIntent = new Intent(MapsActivity.this, FragmentSample.class);
             startActivity(nextIntent);
         }
         else if (id == R.id.aboutUs) {
-            nextIntent = new Intent(MapsActivity.this, FragmentSample.class);
+            nextIntent = new Intent(MapsActivity.this, AboutUs.class);
             startActivity(nextIntent);
         }
         else if (id == R.id.awaitingRequests) {

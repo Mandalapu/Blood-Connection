@@ -336,14 +336,13 @@ public class AwaitingRequests extends AppCompatActivity {
                 {
                     Log.d(TAG, "Async call responding to the request is successful");
                     Log.d(TAG, "Now calling to  remove the positon");
-                    if( position != 0) {
+                    if( listOfRequests.size() >= 1) {
                         listOfRequests.remove(position);
                         listAdapter.notifyDataSetChanged();
                     }
                     else
                     {
-                        String url = constructQueryForAwaitingReq(userId, token);
-                        triggerAsyncTask(url);
+                        noAwaitingRequestsMessage.setVisibility(View.VISIBLE);
                     }
                 }
             }

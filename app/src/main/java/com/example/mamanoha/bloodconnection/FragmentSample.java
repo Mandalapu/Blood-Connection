@@ -1,7 +1,5 @@
 package com.example.mamanoha.bloodconnection;
 
-import android.app.Activity;
-import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,7 +11,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -70,7 +67,7 @@ public class FragmentSample extends AppCompatActivity {
         myrequestsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(getApplicationContext(), "List View Item clicked!", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), "List View Item clicked!", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "Position of the list item that is clicked:" +i);
                 UserRequests request = myrequests.get(i);
                 int requestId = request.getRequestId();

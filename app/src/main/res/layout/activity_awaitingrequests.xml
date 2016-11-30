@@ -29,6 +29,8 @@
         android:visibility="gone"
         android:id="@+id/noawaitingrequestsMessage"
         android:layout_below="@+id/toolbar_parent"
+        android:textSize="22dp"
+        android:textStyle="bold"
         android:text="@string/noawaitingrequests"
         android:gravity="center_horizontal"/>
 

@@ -93,6 +93,8 @@
             android:label="@string/title_activity_request_info"
             android:theme="@style/AppTheme"></activity>
         <activity android:name=".AwaitingRequests" />
+        <activity android:name=".AboutUs" />
+        <activity android:name=".MyProfile" />
     </application>
 
 </manifest>
