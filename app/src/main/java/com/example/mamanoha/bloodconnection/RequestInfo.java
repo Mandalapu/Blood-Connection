@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.mamanoha.bloodconnection.DataObjects.Acceptor;
+import com.example.mamanoha.bloodconnection.DataObjects.ProjectConstants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -290,9 +291,9 @@ public class RequestInfo extends AppCompatActivity {
 
     private String constructQueryForInfo(int requestId, int userId, String token)
     {
-        StringBuilder result = new StringBuilder();
+        StringBuilder result = new StringBuilder(ProjectConstants.URL_HEADER);
         try {
-            result.append("http://192.168.42.76:8080/GiveAPint/getRequestInfo?");
+            result.append("/getRequestInfo?");
             result.append(URLEncoder.encode("requestId", "UTF-8")).append("=").append(URLEncoder.encode(String.valueOf(requestId), "UTF-8")).append("&")
                     .append(URLEncoder.encode("userId", "UTF-8")).append("=").append(URLEncoder.encode(String.valueOf(userId), "UTF-8")).append("&")
                     .append(URLEncoder.encode("token", "UTF-8")).append("=").append(URLEncoder.encode(token, "UTF-8"));

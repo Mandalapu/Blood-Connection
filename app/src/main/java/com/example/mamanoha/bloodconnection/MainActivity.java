@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.mamanoha.bloodconnection.DataObjects.ProjectConstants;
 import com.example.mamanoha.bloodconnection.app.Config;
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -125,7 +126,10 @@ public class MainActivity extends AppCompatActivity {
 
             //this method will be running on background thread so don't update UI frome here
             //do your long running http tasks here,you dont want to pass argument and u can access the parent class' variable url over here
-            String urls = "http://192.168.42.76:8080/GiveAPint/getAllUsers";
+            StringBuilder urlsb = new StringBuilder();
+            urlsb.append(ProjectConstants.URL_HEADER);
+            urlsb.append("/getAllUsers");
+            String urls = urlsb.toString();
             JSONArray response = null;
             HttpURLConnection urlConnection = null;
             URL url = null;

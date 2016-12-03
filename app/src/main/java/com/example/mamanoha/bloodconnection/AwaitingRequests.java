@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.example.mamanoha.bloodconnection.DataObjects.Acceptor;
 import com.example.mamanoha.bloodconnection.DataObjects.AwaitingRequest;
+import com.example.mamanoha.bloodconnection.DataObjects.ProjectConstants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -77,7 +78,9 @@ public class AwaitingRequests extends AppCompatActivity {
     private String constructQueryForAwaitingReq(int userId, String token) {
         StringBuilder result = new StringBuilder();
         try {
-            result.append("http://192.168.42.76:8080/GiveAPint/generateAwaitResults?");
+            //General header
+            result.append(ProjectConstants.URL_HEADER);
+            result.append("/generateAwaitResults?");
             result.append(URLEncoder.encode("responderId", "UTF-8")).append("=").append(URLEncoder.encode(String.valueOf(userId), "UTF-8")).append("&")
                     .append(URLEncoder.encode("token", "UTF-8")).append("=").append(URLEncoder.encode(token, "UTF-8"));
         } catch (UnsupportedEncodingException e) {
@@ -247,7 +250,8 @@ public class AwaitingRequests extends AppCompatActivity {
     private String constructQueryForRespond(int requestId, int userId, String token, String response) {
         StringBuilder result = new StringBuilder();
         try {
-            result.append("http://192.168.42.76:8080/GiveAPint/respondToRequest?");
+            result.append(ProjectConstants.URL_HEADER);
+            result.append("/respondToRequest?");
             result.append(URLEncoder.encode("requestId", "UTF-8")).append("=").append(URLEncoder.encode(String.valueOf(requestId), "UTF-8")).append("&")
                     .append(URLEncoder.encode("userId", "UTF-8")).append("=").append(URLEncoder.encode(String.valueOf(userId), "UTF-8")).append("&")
                     .append(URLEncoder.encode("token", "UTF-8")).append("=").append(URLEncoder.encode(token, "UTF-8")).append("&")

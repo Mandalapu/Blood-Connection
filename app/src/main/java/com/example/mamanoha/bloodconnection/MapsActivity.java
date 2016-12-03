@@ -18,6 +18,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
 
+import com.example.mamanoha.bloodconnection.DataObjects.ProjectConstants;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -374,11 +375,6 @@ public class MapsActivity extends  AppCompatActivity implements OnMapReadyCallba
         mMap = googleMap;
         Log.d("Map", "Came to on Map ready function");
         Log.d("Map", "Map is ready");
-        // Adds a  marker on to some default location when the map is ready.
-        currentLocation = new LatLng(34.02187, -118.28);
-        // TODO: 11/10/2016  this is the default location set just for the testing purpose. It will appeared
-        //only once before clearing the mMap.
-        mMap.addMarker(new MarkerOptions().position(currentLocation).title("Default Location"));
         //Setting the desired map type.
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         Log.d("Map", "First default location is marked on the map");
@@ -405,11 +401,12 @@ public class MapsActivity extends  AppCompatActivity implements OnMapReadyCallba
                 LatLng curLoc = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
                 //While getting the location for the first time after the connection is established or re-established.
                 userMarkerOptions = new MarkerOptions().position(curLoc);
-                userMarker = mMap.addMarker(userMarkerOptions.title("You're here"));
+                // TODO: 12/3/2016 Comments should be taken off once the video demonstation is done.
+                //userMarker = mMap.addMarker(userMarkerOptions.title("You're here"));
                 //mMap.addMarker(userMarkerOptions.title("User current location fetched using the GPS"));
                 LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, mLocationRequest, this);
                 Log.d("Map", "Location fetched is marked on the map");
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()), 14));
+                //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()), 14));
             } else {
                 Log.d("Map", "Current location fetched is null, see what happened");
                 Log.d("Map", "if this happened, there is possiblitiy that you missed out few permission to be asked in manifest");
@@ -532,8 +529,9 @@ public class MapsActivity extends  AppCompatActivity implements OnMapReadyCallba
         // if( userMarker == null || userMarkerOptions == null )
         //{
         userMarkerOptions = new MarkerOptions().position(currentLocation);
-        userMarker = mMap.addMarker(userMarkerOptions.title("You're here"));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 14));
+        //// TODO: 12/3/2016 commented 
+        //userMarker = mMap.addMarker(userMarkerOptions.title("You're here"));
+       // mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 14));
         Log.d("on location change", "marker added for current user");
         //}
         //else, we need to update the marker instead of adding a new marker at new location. This makes sure that there is
@@ -545,7 +543,7 @@ public class MapsActivity extends  AppCompatActivity implements OnMapReadyCallba
          }*/
         //U[pdate the current location of the user according to the frequency time set.
         String urls = constructQuery(location.getLatitude(), location.getLongitude());
-        new UpdateUserLocation().execute(urls);
+       // new UpdateUserLocation().execute(urls);
         Log.d("Asynctask", "Succesfully updated the user location in the database");
         Log.d("Success", "Successfully fetched the current user location");
         //Clear the map and set back the all the user locations.
@@ -571,7 +569,9 @@ public class MapsActivity extends  AppCompatActivity implements OnMapReadyCallba
 
             //this method will be running on background thread so don't update UI frome here
             //do your long running http tasks here,you dont want to pass argument and u can access the parent class' variable url over here
-            String urls = "http://192.168.42.76:8080/GiveAPint/getAllLocations";
+            StringBuilder urlsb = new StringBuilder(ProjectConstants.URL_HEADER);
+            urlsb.append("/getAllLocations");
+            String urls = urlsb.toString();
             JSONArray response = null;
             HttpURLConnection urlConnection = null;
             URL url = null;
@@ -641,6 +641,14 @@ public class MapsActivity extends  AppCompatActivity implements OnMapReadyCallba
                         LatLng usersLocation = new LatLng(item.getDouble("latCoord"), item.getDouble("longCoord"));
                         mMap.addMarker(new MarkerOptions().position(usersLocation).title(Integer.toString(item.getInt("userid"))));
                         Log.d("Map", "this should change the marker positions");
+                    }
+                    //// TODO: 12/3/2016 Should be reomoved, once the video is done.
+                    else
+                    {
+                        //need to change the marker title saying him as the "You're here".
+                        LatLng usersLocation = new LatLng(item.getDouble("latCoord"), item.getDouble("longCoord"));
+                        mMap.addMarker(new MarkerOptions().position(usersLocation).title(("You're here")));
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(usersLocation, 14));
                     }
 
                 }
@@ -754,7 +762,8 @@ public class MapsActivity extends  AppCompatActivity implements OnMapReadyCallba
         Log.d(TAG, "Token and UserId retrieved from the prefs");
         Log.d(TAG, "userid: " +userId);
         Log.d(TAG, "token: "+token);
-        StringBuilder result = new StringBuilder("http://192.168.42.76:8080/GiveAPint/updateLocation?");
+        StringBuilder result = new StringBuilder(ProjectConstants.URL_HEADER);
+        result.append("/updateLocation?");
         try {
             result.append(URLEncoder.encode("userid", "UTF-8")).append("=").append(URLEncoder.encode(String.valueOf(userId), "UTF-8")).append("&")
                     .append(URLEncoder.encode("token", "UTF-8")).append("=").append(URLEncoder.encode(token, "UTF-8")).append("&")
@@ -778,7 +787,8 @@ public class MapsActivity extends  AppCompatActivity implements OnMapReadyCallba
     @NonNull
     private String constructRequestUrl(Map<String, String> params)
     {
-        StringBuilder result = new StringBuilder("http://192.168.42.76:8080/GiveAPint/requestBlood?");
+        StringBuilder result = new StringBuilder(ProjectConstants.URL_HEADER);
+        result.append("/requestBlood?");
         boolean first = true;
         try {
             for (Map.Entry<String, String> entry : params.entrySet()) {

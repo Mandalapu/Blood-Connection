@@ -15,6 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.mamanoha.bloodconnection.DataObjects.ProjectConstants;
 import com.example.mamanoha.bloodconnection.DataObjects.UserRequests;
 
 import org.json.JSONArray;
@@ -87,7 +88,8 @@ public class FragmentSample extends AppCompatActivity {
     private String constructQueryRequests(int userId, String token) {
         StringBuilder result = new StringBuilder();
         try {
-            result.append("http://192.168.42.76:8080/GiveAPint/getRequestsForUser?");
+            result.append(ProjectConstants.URL_HEADER);
+            result.append("/getRequestsForUser?");
             result.append(URLEncoder.encode("userId", "UTF-8")).append("=").append(URLEncoder.encode(String.valueOf(userId), "UTF-8")).append("&")
                     .append(URLEncoder.encode("token", "UTF-8")).append("=").append(URLEncoder.encode(token, "UTF-8"));
         } catch (UnsupportedEncodingException e) {

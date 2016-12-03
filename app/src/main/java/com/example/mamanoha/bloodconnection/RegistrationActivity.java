@@ -19,6 +19,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.mamanoha.bloodconnection.DataObjects.ProjectConstants;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -170,8 +172,8 @@ public class RegistrationActivity extends AppCompatActivity {
         }
 
         private String constructQuery() {
-            StringBuilder result = new StringBuilder();
-            result.append("http://192.168.42.76:8080/GiveAPint/registerUser?");
+            StringBuilder result = new StringBuilder(ProjectConstants.URL_HEADER);
+            result.append("/registerUser?");
             try {
 
                 result.append(URLEncoder.encode("firstName", "UTF-8")).append("=").append(URLEncoder.encode(registerData.getFirstName(), "UTF-8")).append("&")

@@ -56,4 +56,8 @@
     <string name="title_activity_request_info">RequestInfo</string>
     <string name="title_activity_awaitingrequests">Awaiting Requests</string>
     <string name="noawaitingrequests">Currently, there are no awaiting requests to respond.</string>
+    <string name="aboutus1">"Blood Connection", is a platform to connect the blood recipients with the donors. The main purpose of the
+    application is to just connect them, and the proceedings after the connection is left to the users.</string>
+    <string name="aboutus2"> The major challenges including the implementation  and privacy are covered in the documentation.</string>
+
 </resources>

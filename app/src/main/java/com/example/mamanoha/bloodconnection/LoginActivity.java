@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.mamanoha.bloodconnection.DataObjects.ProjectConstants;
 import com.example.mamanoha.bloodconnection.Service.MyFirebaseInstanceIDService;
 
 import org.json.JSONException;
@@ -105,7 +106,8 @@ public class LoginActivity extends AppCompatActivity {
         private String constructQuery() {
             StringBuilder result = new StringBuilder();
             try {
-                result.append("http://192.168.42.76:8080/GiveAPint/loginUser?");
+                result.append(ProjectConstants.URL_HEADER);
+                result.append("/loginUser?");
                 result.append(URLEncoder.encode("userName", "UTF-8")).append("=").append(URLEncoder.encode(userName, "UTF-8")).append("&")
                         .append(URLEncoder.encode("passcode", "UTF-8")).append("=").append(URLEncoder.encode(passcode, "UTF-8")).append("&")
                         .append(URLEncoder.encode("token", "UTF-8")).append("=").append(URLEncoder.encode(token, "UTF-8"));
@@ -231,7 +233,8 @@ public class LoginActivity extends AppCompatActivity {
         {
             StringBuilder result = new StringBuilder();
             try {
-                result.append("http://192.168.42.76:8080/GiveAPint/registerNotificationToken?");
+                result.append(ProjectConstants.URL_HEADER);
+                result.append("/registerNotificationToken?");
                 result.append(URLEncoder.encode("userName", "UTF-8")).append("=").append(URLEncoder.encode(userName, "UTF-8")).append("&")
                         .append(URLEncoder.encode("regId", "UTF-8")).append("=").append(URLEncoder.encode(regId, "UTF-8"));
             }
